@@ -12,7 +12,7 @@ NUM_LAYERS   = 1        # was 2
 DROPOUT      = 0.5      # was 0.3 — stronger regularization
 
 # --- Training ---
-TRAIN_BARS    = 150000  # was 50000 — more data fights overfitting
+TRAIN_BARS    = 100000  # was 50000 — more data fights overfitting
 EPOCHS        = 40
 BATCH_SIZE    = 128
 LEARNING_RATE = 0.0005
