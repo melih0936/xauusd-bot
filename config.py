@@ -5,21 +5,23 @@
 SYMBOL      = "XAUUSD"
 TIMEFRAMES  = ["M1", "M5", "M15"]
 
-# --- Model ---
-SEQ_LEN      = 60       # Bars to look back
-HIDDEN_SIZE  = 256      # Increased from 128 for more capacity
-NUM_LAYERS   = 2
-DROPOUT      = 0.3      # Slightly higher dropout to prevent overfitting
+# --- Model (SHRUNK to reduce overfitting) ---
+SEQ_LEN      = 60
+HIDDEN_SIZE  = 64       # was 256 — smaller model generalizes better
+NUM_LAYERS   = 1        # was 2
+DROPOUT      = 0.5      # was 0.3 — stronger regularization
 
 # --- Training ---
-TRAIN_BARS    = 50000
-EPOCHS        = 60
-BATCH_SIZE    = 128     # Larger batch = more stable gradients
-LEARNING_RATE = 0.0005  # Slightly lower for better convergence
+TRAIN_BARS    = 150000  # was 50000 — more data fights overfitting
+EPOCHS        = 40
+BATCH_SIZE    = 128
+LEARNING_RATE = 0.0005
+WEIGHT_DECAY  = 1e-4    # NEW — L2 regularization
+EARLY_STOP_PATIENCE = 8 # NEW — stop if no improvement for 8 epochs
 
-# --- Labels (FIXED — proper BUY/SELL/HOLD distribution) ---
-LABEL_THRESHOLD = 0.001   # 0.1% move threshold (was 0.3% — too high for M1)
-LABEL_BARS      = 30      # Look 30 M1 bars ahead = 30 minutes (was 10)
+# --- Labels ---
+LABEL_THRESHOLD = 0.0015  # 0.15% move
+LABEL_BARS      = 60      # look 60 M1 bars (1 hour) ahead — was 30 (too noisy)
 
 # --- Risk Management ---
 RISK_PER_TRADE       = 0.01
@@ -27,6 +29,8 @@ ATR_SL_MULTIPLIER    = 2.0
 RR_RATIO             = 2.0
 MAX_POSITIONS        = 3
 DAILY_DRAWDOWN_LIMIT = 0.03
+MIN_LOT = 0.01
+MAX_LOT = 0.04
 
 # --- Signal ---
 MIN_CONFIDENCE = 0.60
