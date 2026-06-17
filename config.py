@@ -12,7 +12,7 @@ NUM_LAYERS   = 1        # was 2
 DROPOUT      = 0.5      # was 0.3 — stronger regularization
 
 # --- Training ---
-TRAIN_BARS    = 100000  # was 50000 — more data fights overfitting
+TRAIN_BARS    = 150000  # was 50000 — more data fights overfitting
 EPOCHS        = 40
 BATCH_SIZE    = 128
 LEARNING_RATE = 0.0005
@@ -38,3 +38,16 @@ MIN_CONFIDENCE = 0.60
 # --- Files ---
 MODEL_PATH  = "model.pt"
 SCALER_PATH = "scaler.pkl"
+
+# --- News Filter ---
+NEWS_BLACKOUT_MINUTES = 30   # Skip trading ±30 min around high-impact events
+
+# ⚠️ MUST VERIFY — MT5 timestamps are in your BROKER'S server time, not US Eastern.
+# How to find the right value:
+#   1. Run: py -3.11 -c "import MetaTrader5 as mt5; mt5.initialize(); print(mt5.symbol_info_tick('XAUUSD').time)"
+#      Paste that number into unixtimestamp.com to see what time MT5 thinks it is.
+#   2. Check the real current time in New York: timeanddate.com/worldclock/usa/new-york
+#   3. SERVER_OFFSET_FROM_ET_HOURS = (MT5's hour) - (New York's hour)
+#      Example: MT5 shows 21:15, New York is actually 14:15 → offset = 7
+#   4. Re-check this in March and November when US/broker DST changes.
+SERVER_OFFSET_FROM_ET_HOURS = 4   # PLACEHOLDER — replace with your real value

@@ -16,6 +16,7 @@ import config
 from connector import MT5Connector
 from features import build_features
 from model import AITrader
+from news_filter import is_news_blackout
 from risk import RiskManager
 
 
@@ -89,9 +90,14 @@ def evaluate(connector: MT5Connector, trader: AITrader,
         print(f" 🛑  Blocked: {reason}")
         return
 
+    blackout, event_name, mins_away = is_news_blackout(m1_df.index[-1])
+    if blackout:
+        print(f" 📰  News blackout: {event_name} ~{abs(mins_away):.0f}min away — skipping")
+        return
+
     # 7. Place order
     sl, tp, sl_dist = risk.sl_tp(config.SYMBOL, direction, price, atr_val)
-    lot             = risk.lot_size(config.SYMBOL, balance, sl_dist)
+    lot             = risk.lot_size(config.SYMBOL, balance, sl_dist, confidence)
 
     print(f" 🔔  {direction} | lot={lot} | SL={sl:.2f} | TP={tp:.2f} | ATR={atr_val:.2f}")
     connector.place_order(config.SYMBOL, direction, lot, sl, tp)
