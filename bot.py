@@ -152,10 +152,18 @@ def main():
             except Exception as e:
                 print(f"⚠️  Cycle error: {e}")
 
-            # Wait 60 s (M1 bar close)
-            for remaining in range(60, 0, -1):
-                print(f"\r ⏳ Next evaluation in {remaining:2d}s ...", end="", flush=True)
-                time.sleep(1)
+            # Sync precisely to the NEXT M1 bar close — not a flat 60s sleep.
+            # A flat sleep drifts later every cycle by however long evaluate()
+            # took to run. This instead always wakes up ~1s after each new
+            # minute boundary, so we never lag behind the actual bar close.
+            now = datetime.now()
+            seconds_into_minute = now.second + now.microsecond / 1_000_000
+            wait = max(1.0, 61.0 - seconds_into_minute)
+            while wait > 0:
+                print(f"\r ⏳ Next bar close in {wait:4.1f}s ...", end="", flush=True)
+                step = min(1.0, wait)
+                time.sleep(step)
+                wait -= step
 
     except KeyboardInterrupt:
         print("\n\n🛑 Bot stopped by user.")
